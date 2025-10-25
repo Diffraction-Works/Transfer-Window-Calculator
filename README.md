@@ -64,4 +64,4 @@ Feel free to submit issues or pull requests for improvements.
 
 ## License
 
-This project is open-source. Please check the repository for license details.
+All Rights Reserved © Diffraction-Works
