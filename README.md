@@ -12,6 +12,14 @@ A Python application with a GUI to calculate the phase angle between two planets
 
 ## Installation
 
+### Quick Install (Recommended for Windows Users)
+
+1. Navigate to the [Releases](https://github.com/Diffraction-Works/Transfer-Window-Calculator/releases) tab in this repository and open the latest release.
+2. Download the .exe file within the release.
+3. Run the downloaded .exe file to launch the application.
+
+### Manual Install
+
 1. Clone the repository:
    ```
    git clone https://github.com/Diffraction-Works/Transfer-Window-Calculator.git
