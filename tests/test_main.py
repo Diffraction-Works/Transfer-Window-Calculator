@@ -57,7 +57,7 @@ class TestTransferWindowCalculator(unittest.TestCase):
         self.app.calculate()
 
         # Check that error was shown
-        mock_showerror.assert_called_with("Error", "Please enter valid numbers for all fields.")
+        mock_showerror.assert_called_with("Error", "could not convert string to float: 'invalid'")
 
 if __name__ == '__main__':
     unittest.main()

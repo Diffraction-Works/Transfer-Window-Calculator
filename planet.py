@@ -23,6 +23,10 @@ class Planet:
 
         :return: Orbital period in seconds
         """
+        if self.a <= 0:
+            raise ValueError("Semi-major axis must be positive.")
+        if self.M <= 0:
+            raise ValueError("Central body mass must be positive.")
         G = 6.67430e-11  # Gravitational constant
         return 2 * math.pi * math.sqrt(self.a**3 / (G * self.M))
 

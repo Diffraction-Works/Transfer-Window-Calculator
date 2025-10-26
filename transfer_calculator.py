@@ -29,8 +29,8 @@ def transfer_window_time(planet1, planet2, target_phase=0):
     n2 = 2 * math.pi / planet2.orbital_period()
     delta_n = n2 - n1
 
-    if delta_n == 0:
-        return 0  # Same period, no transfer window concept
+    if abs(delta_n) < 1e-10:  # Handle near-zero difference to avoid division by very small number
+        raise ValueError("Planets have nearly identical orbital periods; transfer window calculation not applicable.")
 
     # Current phase angle
     phi_current = phase_angle(planet1, planet2, 0)

@@ -95,16 +95,28 @@ class TransferWindowCalculator:
         try:
             # Get inputs
             p1_name = self.planet1_name.get()
-            p1_a = float(self.planet1_a.get()) * 1000  # Convert km to m
+            p1_a_km = float(self.planet1_a.get())
+            if p1_a_km <= 0:
+                raise ValueError("Semi-major axis for Planet 1 must be positive.")
+            p1_a = p1_a_km * 1000  # Convert km to m
             p1_mass = float(self.planet1_mass.get())
+            if p1_mass <= 0:
+                raise ValueError("Mass for Planet 1 must be positive.")
             p1_theta0 = float(self.planet1_theta0.get())
 
             p2_name = self.planet2_name.get()
-            p2_a = float(self.planet2_a.get()) * 1000  # Convert km to m
+            p2_a_km = float(self.planet2_a.get())
+            if p2_a_km <= 0:
+                raise ValueError("Semi-major axis for Planet 2 must be positive.")
+            p2_a = p2_a_km * 1000  # Convert km to m
             p2_mass = float(self.planet2_mass.get())
+            if p2_mass <= 0:
+                raise ValueError("Mass for Planet 2 must be positive.")
             p2_theta0 = float(self.planet2_theta0.get())
 
             M = float(self.central_mass.get())
+            if M <= 0:
+                raise ValueError("Central body mass must be positive.")
             t_days = float(self.time_days.get())
             t = t_days * 24 * 3600  # Convert days to seconds
 
@@ -123,7 +135,7 @@ class TransferWindowCalculator:
             self.hohmann_time_label.config(text=f"Hohmann Transfer Time: {hohmann_t / (24*3600):.2f} days")
 
         except ValueError as e:
-            messagebox.showerror("Error", "Please enter valid numbers for all fields.")
+            messagebox.showerror("Error", str(e))
 
 if __name__ == "__main__":
     root = tk.Tk()
