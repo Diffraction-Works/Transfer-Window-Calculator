@@ -1,6 +1,12 @@
+"""
+Transfer Window Calculator
+
+A GUI application for calculating transfer windows between two planets using orbital mechanics.
+"""
 import tkinter as tk
 from tkinter import ttk, messagebox
 import math
+import logging
 from typing import Optional
 from planet import Planet
 from transfer_calculator import phase_angle, transfer_window_time, hohmann_transfer_time
@@ -21,6 +27,7 @@ DEFAULT_TIME_DAYS = 0.0
 
 KM_TO_M = 1000
 DAYS_TO_SECONDS = 24 * 3600
+PHASE_ANGLE_MAX = 360
 
 class TransferWindowCalculator:
     """
@@ -30,6 +37,10 @@ class TransferWindowCalculator:
         self.root = root
         self.root.title("Transfer Window Calculator")
         self.root.geometry("600x500")
+
+        # Set up logging
+        logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+        self.logger = logging.getLogger(__name__)
 
         # Create menu bar
         self.create_menu_bar()
@@ -174,7 +185,7 @@ class TransferWindowCalculator:
             central_mass = self._get_positive_float(self.central_mass, "Central body mass")
             if self.time_days is None:
                 raise ValueError("Time days entry is not initialized.")
-            time_days = float(self.time_days.get() or 0)
+            time_days = self._get_non_negative_float(self.time_days, "Time (days)")
             time_seconds = time_days * DAYS_TO_SECONDS
 
             # Create planets
@@ -192,8 +203,10 @@ class TransferWindowCalculator:
             self.hohmann_time_label.config(text=f"Hohmann Transfer Time: {hohmann_t / DAYS_TO_SECONDS:.2f} days")
 
         except ValueError as e:
+            self.logger.error(f"Input error: {str(e)}")
             messagebox.showerror("Input Error", str(e))
         except Exception as e:
+            self.logger.error(f"Calculation error: {str(e)}")
             messagebox.showerror("Calculation Error", f"An unexpected error occurred: {str(e)}")
 
     def _get_planet_data(self, planet_num: int) -> tuple[str, float, float, float]:
@@ -224,7 +237,7 @@ class TransferWindowCalculator:
         a_km = self._get_positive_float(a_entry, f"Semi-major axis for Planet {planet_num}")
         a_m = a_km * KM_TO_M
         mass = self._get_positive_float(mass_entry, f"Mass for Planet {planet_num}")
-        theta0 = float(theta_entry.get() or 0)
+        theta0 = self._get_theta0(theta_entry, f"Initial Mean Anomaly for Planet {planet_num}")
 
         return name, a_m, mass, theta0
 
@@ -245,6 +258,42 @@ class TransferWindowCalculator:
             return value
         except ValueError:
             raise ValueError(f"{field_name} must be a valid positive number.")
+
+    def _get_theta0(self, entry: Optional[ttk.Entry], field_name: str) -> float:
+        """
+        Get and validate theta0 (0-360 degrees) from an entry field.
+
+        :param entry: The entry widget
+        :param field_name: Name of the field for error messages
+        :return: The validated theta0 value
+        """
+        if entry is None:
+            raise ValueError(f"{field_name} entry is not initialized.")
+        try:
+            value = float(entry.get())
+            if not (0 <= value <= PHASE_ANGLE_MAX):
+                raise ValueError(f"{field_name} must be between 0 and {PHASE_ANGLE_MAX} degrees.")
+            return value
+        except ValueError:
+            raise ValueError(f"{field_name} must be a valid number between 0 and {PHASE_ANGLE_MAX}.")
+
+    def _get_non_negative_float(self, entry: Optional[ttk.Entry], field_name: str) -> float:
+        """
+        Get a non-negative float value from an entry field.
+
+        :param entry: The entry widget
+        :param field_name: Name of the field for error messages
+        :return: The non-negative float value
+        """
+        if entry is None:
+            raise ValueError(f"{field_name} entry is not initialized.")
+        try:
+            value = float(entry.get())
+            if value < 0:
+                raise ValueError(f"{field_name} must be non-negative.")
+            return value
+        except ValueError:
+            raise ValueError(f"{field_name} must be a valid non-negative number.")
 
 if __name__ == "__main__":
     root = tk.Tk()

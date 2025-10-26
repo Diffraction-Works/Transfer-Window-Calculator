@@ -136,7 +136,58 @@ class TestTransferWindowCalculator(unittest.TestCase):
 
         self.app.calculate()
 
-        mock_showerror.assert_called_with("Input Error", "could not convert string to float: 'invalid'")
+        mock_showerror.assert_called_with("Input Error", "Initial Mean Anomaly for Planet 1 must be a valid number between 0 and 360.")
+
+    @patch('main.messagebox.showerror')
+    def test_calculate_theta0_negative(self, mock_showerror):
+        self.app.planet1_theta0.get.return_value = "-1"  # type: ignore
+        self.app.planet1_name.get.return_value = "Earth"  # type: ignore
+        self.app.planet1_a.get.return_value = "149597870.7"  # type: ignore
+        self.app.planet1_mass.get.return_value = "5.972e24"  # type: ignore
+        self.app.planet2_name.get.return_value = "Mars"  # type: ignore
+        self.app.planet2_a.get.return_value = "227939366.0"  # type: ignore
+        self.app.planet2_mass.get.return_value = "6.39e23"  # type: ignore
+        self.app.planet2_theta0.get.return_value = "0"  # type: ignore
+        self.app.central_mass.get.return_value = "1.989e30"  # type: ignore
+        self.app.time_days.get.return_value = "0"  # type: ignore
+
+        self.app.calculate()
+
+        mock_showerror.assert_called_with("Input Error", "Initial Mean Anomaly for Planet 1 must be a valid number between 0 and 360.")
+
+    @patch('main.messagebox.showerror')
+    def test_calculate_theta0_over_360(self, mock_showerror):
+        self.app.planet1_theta0.get.return_value = "361"  # type: ignore
+        self.app.planet1_name.get.return_value = "Earth"  # type: ignore
+        self.app.planet1_a.get.return_value = "149597870.7"  # type: ignore
+        self.app.planet1_mass.get.return_value = "5.972e24"  # type: ignore
+        self.app.planet2_name.get.return_value = "Mars"  # type: ignore
+        self.app.planet2_a.get.return_value = "227939366.0"  # type: ignore
+        self.app.planet2_mass.get.return_value = "6.39e23"  # type: ignore
+        self.app.planet2_theta0.get.return_value = "0"  # type: ignore
+        self.app.central_mass.get.return_value = "1.989e30"  # type: ignore
+        self.app.time_days.get.return_value = "0"  # type: ignore
+
+        self.app.calculate()
+
+        mock_showerror.assert_called_with("Input Error", "Initial Mean Anomaly for Planet 1 must be a valid number between 0 and 360.")
+
+    @patch('main.messagebox.showerror')
+    def test_calculate_negative_time_days(self, mock_showerror):
+        self.app.planet1_theta0.get.return_value = "0"  # type: ignore
+        self.app.planet1_name.get.return_value = "Earth"  # type: ignore
+        self.app.planet1_a.get.return_value = "149597870.7"  # type: ignore
+        self.app.planet1_mass.get.return_value = "5.972e24"  # type: ignore
+        self.app.planet2_name.get.return_value = "Mars"  # type: ignore
+        self.app.planet2_a.get.return_value = "227939366.0"  # type: ignore
+        self.app.planet2_mass.get.return_value = "6.39e23"  # type: ignore
+        self.app.planet2_theta0.get.return_value = "0"  # type: ignore
+        self.app.central_mass.get.return_value = "1.989e30"  # type: ignore
+        self.app.time_days.get.return_value = "-1"  # type: ignore
+
+        self.app.calculate()
+
+        mock_showerror.assert_called_with("Input Error", "Time (days) must be a valid non-negative number.")
 
     @patch('main.messagebox.showerror')
     def test_calculate_zero_central_mass(self, mock_showerror):
