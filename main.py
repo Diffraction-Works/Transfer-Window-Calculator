@@ -108,14 +108,28 @@ class TransferWindowCalculator:
         input_frame = ttk.LabelFrame(self.root, text="Planet Parameters")
         input_frame.pack(pady=10, padx=10, fill="x")
 
-        # Planet 1 inputs
+        self.create_planet1_inputs(input_frame)
+        self.create_planet2_inputs(input_frame)
+        self.create_central_inputs(input_frame)
+
+    def create_planet1_inputs(self, input_frame: ttk.LabelFrame) -> None:
+        """
+        Create input fields for Planet 1.
+        """
         self._create_planet_inputs(input_frame, 0, "Planet 1", self.planet1_name, self.planet1_a, self.planet1_mass, self.planet1_theta0,
                                    DEFAULT_PLANET1_NAME, str(DEFAULT_PLANET1_A_KM), str(DEFAULT_PLANET1_MASS), str(DEFAULT_PLANET1_THETA0))
 
-        # Planet 2 inputs
+    def create_planet2_inputs(self, input_frame: ttk.LabelFrame) -> None:
+        """
+        Create input fields for Planet 2.
+        """
         self._create_planet_inputs(input_frame, 4, "Planet 2", self.planet2_name, self.planet2_a, self.planet2_mass, self.planet2_theta0,
                                    DEFAULT_PLANET2_NAME, str(DEFAULT_PLANET2_A_KM), str(DEFAULT_PLANET2_MASS), str(DEFAULT_PLANET2_THETA0))
 
+    def create_central_inputs(self, input_frame: ttk.LabelFrame) -> None:
+        """
+        Create input fields for central body mass and time.
+        """
         # Central body
         ttk.Label(input_frame, text="Central Body Mass (kg):").grid(row=8, column=0, sticky="w")
         self.central_mass = ttk.Entry(input_frame)

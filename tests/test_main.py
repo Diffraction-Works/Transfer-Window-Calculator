@@ -237,5 +237,24 @@ class TestTransferWindowCalculator(unittest.TestCase):
 
         mock_showerror.assert_not_called()
 
+    @patch('main.messagebox.showerror')
+    def test_calculate_identical_planets(self, mock_showerror):
+        # Set identical planet parameters
+        self.app.planet1_name.get.return_value = "Earth"  # type: ignore
+        self.app.planet1_a.get.return_value = "149597870.7"  # type: ignore
+        self.app.planet1_mass.get.return_value = "5.972e24"  # type: ignore
+        self.app.planet1_theta0.get.return_value = "0"  # type: ignore
+        self.app.planet2_name.get.return_value = "Earth"  # type: ignore
+        self.app.planet2_a.get.return_value = "149597870.7"  # type: ignore
+        self.app.planet2_mass.get.return_value = "5.972e24"  # type: ignore
+        self.app.planet2_theta0.get.return_value = "0"  # type: ignore
+        self.app.central_mass.get.return_value = "1.989e30"  # type: ignore
+        self.app.time_days.get.return_value = "0"  # type: ignore
+
+        self.app.calculate()
+
+        # Check that error was shown for identical planets
+        mock_showerror.assert_called_with("Input Error", "Planets have nearly identical orbital periods; transfer window calculation not applicable.")
+
 if __name__ == '__main__':
     unittest.main()
