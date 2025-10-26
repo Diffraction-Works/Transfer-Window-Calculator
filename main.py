@@ -31,6 +31,9 @@ class TransferWindowCalculator:
         self.root.title("Transfer Window Calculator")
         self.root.geometry("600x500")
 
+        # Create menu bar
+        self.create_menu_bar()
+
         # Initialize input attributes
         self.planet1_name: Optional[ttk.Entry] = None
         self.planet1_a: Optional[ttk.Entry] = None
@@ -52,6 +55,40 @@ class TransferWindowCalculator:
         # Calculate button
         self.calculate_button = ttk.Button(root, text="Calculate", command=self.calculate)
         self.calculate_button.pack(pady=10)
+
+    def create_menu_bar(self) -> None:
+        """
+        Create the menu bar with Help menu.
+        """
+        menubar = tk.Menu(self.root)
+        self.root.config(menu=menubar)
+
+        # Help menu
+        help_menu = tk.Menu(menubar, tearoff=0)
+        menubar.add_cascade(label="Help", menu=help_menu)
+        help_menu.add_command(label="Instructions", command=self.show_help)
+
+    def show_help(self) -> None:
+        """
+        Display the help dialog with usage instructions.
+        """
+        help_text = (
+            "Transfer Window Calculator Instructions:\n\n"
+            "This application calculates transfer windows between two planets using orbital mechanics.\n\n"
+            "Inputs:\n"
+            "- Planet 1 & 2 Name: Name of the planets (e.g., Earth, Mars).\n"
+            "- Semi-major Axis (km): Distance from the central body to the planet.\n"
+            "- Mass (kg): Mass of the planet.\n"
+            "- Initial Mean Anomaly (deg): Starting position of the planet in its orbit (0-360 degrees).\n"
+            "- Central Body Mass (kg): Mass of the central body (e.g., Sun).\n"
+            "- Time (days): Current time in days for phase angle calculation.\n\n"
+            "Outputs:\n"
+            "- Phase Angle: Angle between the two planets at the given time.\n"
+            "- Time to Transfer Window: Time until the optimal transfer opportunity.\n"
+            "- Hohmann Transfer Time: Time for a Hohmann transfer orbit between the planets.\n\n"
+            "Click 'Calculate' to perform the calculations. Ensure all inputs are valid positive numbers."
+        )
+        messagebox.showinfo("Help - Instructions", help_text)
 
     def create_input_fields(self) -> None:
         """
