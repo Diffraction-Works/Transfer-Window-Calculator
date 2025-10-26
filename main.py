@@ -3,13 +3,17 @@ Transfer Window Calculator
 
 A GUI application for calculating transfer windows between two planets using orbital mechanics.
 """
-import tkinter as tk
-from tkinter import ttk, messagebox
+import customtkinter as ctk
+from tkinter import messagebox
 import math
 import logging
 from typing import Optional
 from planet import Planet
 from transfer_calculator import phase_angle, transfer_window_time, hohmann_transfer_time
+
+# Set appearance mode and color theme
+ctk.set_appearance_mode("dark")  # Modes: "System" (standard), "Dark", "Light"
+ctk.set_default_color_theme("blue")  # Themes: "blue" (standard), "green", "dark-blue"
 
 # Constants
 DEFAULT_PLANET1_NAME = "Earth"
@@ -33,10 +37,10 @@ class TransferWindowCalculator:
     """
     A GUI application for calculating transfer windows between two planets.
     """
-    def __init__(self, root: tk.Tk) -> None:
+    def __init__(self, root: ctk.CTk) -> None:
         self.root = root
         self.root.title("Transfer Window Calculator")
-        self.root.geometry("600x500")
+        self.root.geometry("800x600")
 
         # Set up logging
         logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -45,17 +49,21 @@ class TransferWindowCalculator:
         # Create menu bar
         self.create_menu_bar()
 
+        # Appearance toggle
+        self.appearance_mode_button = ctk.CTkButton(self.root, text="Toggle Dark/Light", command=self.toggle_appearance)
+        self.appearance_mode_button.pack(pady=5)
+
         # Initialize input attributes
-        self.planet1_name: Optional[ttk.Entry] = None
-        self.planet1_a: Optional[ttk.Entry] = None
-        self.planet1_mass: Optional[ttk.Entry] = None
-        self.planet1_theta0: Optional[ttk.Entry] = None
-        self.planet2_name: Optional[ttk.Entry] = None
-        self.planet2_a: Optional[ttk.Entry] = None
-        self.planet2_mass: Optional[ttk.Entry] = None
-        self.planet2_theta0: Optional[ttk.Entry] = None
-        self.central_mass: Optional[ttk.Entry] = None
-        self.time_days: Optional[ttk.Entry] = None
+        self.planet1_name: Optional[ctk.CTkEntry] = None
+        self.planet1_a: Optional[ctk.CTkEntry] = None
+        self.planet1_mass: Optional[ctk.CTkEntry] = None
+        self.planet1_theta0: Optional[ctk.CTkEntry] = None
+        self.planet2_name: Optional[ctk.CTkEntry] = None
+        self.planet2_a: Optional[ctk.CTkEntry] = None
+        self.planet2_mass: Optional[ctk.CTkEntry] = None
+        self.planet2_theta0: Optional[ctk.CTkEntry] = None
+        self.central_mass: Optional[ctk.CTkEntry] = None
+        self.time_days: Optional[ctk.CTkEntry] = None
 
         # Input fields
         self.create_input_fields()
@@ -64,20 +72,15 @@ class TransferWindowCalculator:
         self.create_output_fields()
 
         # Calculate button
-        self.calculate_button = ttk.Button(root, text="Calculate", command=self.calculate)
+        self.calculate_button = ctk.CTkButton(root, text="Calculate", command=self.calculate)
         self.calculate_button.pack(pady=10)
 
     def create_menu_bar(self) -> None:
         """
-        Create the menu bar with Help menu.
+        Create the help button.
         """
-        menubar = tk.Menu(self.root)
-        self.root.config(menu=menubar)
-
-        # Help menu
-        help_menu = tk.Menu(menubar, tearoff=0)
-        menubar.add_cascade(label="Help", menu=help_menu)
-        help_menu.add_command(label="Instructions", command=self.show_help)
+        self.help_button = ctk.CTkButton(self.root, text="Help", command=self.show_help)
+        self.help_button.pack(pady=5, padx=5, anchor="ne")
 
     def show_help(self) -> None:
         """
@@ -101,92 +104,108 @@ class TransferWindowCalculator:
         )
         messagebox.showinfo("Help - Instructions", help_text)
 
+    def toggle_appearance(self) -> None:
+        """
+        Toggle between dark and light mode.
+        """
+        current_mode = ctk.get_appearance_mode()
+        if current_mode == "Dark":
+            ctk.set_appearance_mode("Light")
+        else:
+            ctk.set_appearance_mode("Dark")
+
     def create_input_fields(self) -> None:
         """
         Create the input fields for planet parameters.
         """
-        input_frame = ttk.LabelFrame(self.root, text="Planet Parameters")
+        input_frame = ctk.CTkFrame(self.root)
         input_frame.pack(pady=10, padx=10, fill="x")
+
+        title_label = ctk.CTkLabel(input_frame, text="Planet Parameters", font=ctk.CTkFont(size=16, weight="bold"))
+        title_label.grid(row=0, column=0, columnspan=2, pady=5)
 
         self.create_planet1_inputs(input_frame)
         self.create_planet2_inputs(input_frame)
         self.create_central_inputs(input_frame)
 
-    def create_planet1_inputs(self, input_frame: ttk.LabelFrame) -> None:
+    def create_planet1_inputs(self, input_frame: ctk.CTkFrame) -> None:
         """
         Create input fields for Planet 1.
         """
-        self._create_planet_inputs(input_frame, 0, "Planet 1", self.planet1_name, self.planet1_a, self.planet1_mass, self.planet1_theta0,
+        self._create_planet_inputs(input_frame, 1, "Planet 1", self.planet1_name, self.planet1_a, self.planet1_mass, self.planet1_theta0,
                                    DEFAULT_PLANET1_NAME, str(DEFAULT_PLANET1_A_KM), str(DEFAULT_PLANET1_MASS), str(DEFAULT_PLANET1_THETA0))
 
-    def create_planet2_inputs(self, input_frame: ttk.LabelFrame) -> None:
+    def create_planet2_inputs(self, input_frame: ctk.CTkFrame) -> None:
         """
         Create input fields for Planet 2.
         """
-        self._create_planet_inputs(input_frame, 4, "Planet 2", self.planet2_name, self.planet2_a, self.planet2_mass, self.planet2_theta0,
+        self._create_planet_inputs(input_frame, 5, "Planet 2", self.planet2_name, self.planet2_a, self.planet2_mass, self.planet2_theta0,
                                    DEFAULT_PLANET2_NAME, str(DEFAULT_PLANET2_A_KM), str(DEFAULT_PLANET2_MASS), str(DEFAULT_PLANET2_THETA0))
 
-    def create_central_inputs(self, input_frame: ttk.LabelFrame) -> None:
+    def create_central_inputs(self, input_frame: ctk.CTkFrame) -> None:
         """
         Create input fields for central body mass and time.
         """
         # Central body
-        ttk.Label(input_frame, text="Central Body Mass (kg):").grid(row=8, column=0, sticky="w")
-        self.central_mass = ttk.Entry(input_frame)
+        ctk.CTkLabel(input_frame, text="Central Body Mass (kg):").grid(row=8, column=0, sticky="w", padx=5, pady=2)
+        self.central_mass = ctk.CTkEntry(input_frame)
         self.central_mass.grid(row=8, column=1, padx=5, pady=2)
         self.central_mass.insert(0, str(DEFAULT_CENTRAL_MASS))
 
         # Time
-        ttk.Label(input_frame, text="Time (days):").grid(row=9, column=0, sticky="w")
-        self.time_days = ttk.Entry(input_frame)
+        ctk.CTkLabel(input_frame, text="Time (days):").grid(row=9, column=0, sticky="w", padx=5, pady=2)
+        self.time_days = ctk.CTkEntry(input_frame)
         self.time_days.grid(row=9, column=1, padx=5, pady=2)
         self.time_days.insert(0, str(DEFAULT_TIME_DAYS))
 
-    def _create_planet_inputs(self, frame: ttk.LabelFrame, start_row: int, label_prefix: str,
-                              name_entry: Optional[ttk.Entry], a_entry: Optional[ttk.Entry],
-                              mass_entry: Optional[ttk.Entry], theta_entry: Optional[ttk.Entry],
+    def _create_planet_inputs(self, frame: ctk.CTkFrame, start_row: int, label_prefix: str,
+                              name_entry: Optional[ctk.CTkEntry], a_entry: Optional[ctk.CTkEntry],
+                              mass_entry: Optional[ctk.CTkEntry], theta_entry: Optional[ctk.CTkEntry],
                               default_name: str, default_a: str, default_mass: str, default_theta: str) -> None:
         """
         Helper method to create input fields for a planet.
         """
         attr_prefix = label_prefix.lower().replace(' ', '')
 
-        ttk.Label(frame, text=f"{label_prefix} Name:").grid(row=start_row, column=0, sticky="w")
-        name_entry = ttk.Entry(frame)
+        ctk.CTkLabel(frame, text=f"{label_prefix} Name:").grid(row=start_row, column=0, sticky="w", padx=5, pady=2)
+        name_entry = ctk.CTkEntry(frame)
         name_entry.grid(row=start_row, column=1, padx=5, pady=2)
         name_entry.insert(0, default_name)
         setattr(self, f"{attr_prefix}_name", name_entry)
 
-        ttk.Label(frame, text="Semi-major Axis (km):").grid(row=start_row+1, column=0, sticky="w")
-        a_entry = ttk.Entry(frame)
+        ctk.CTkLabel(frame, text="Semi-major Axis (km):").grid(row=start_row+1, column=0, sticky="w", padx=5, pady=2)
+        a_entry = ctk.CTkEntry(frame)
         a_entry.grid(row=start_row+1, column=1, padx=5, pady=2)
         a_entry.insert(0, default_a)
         setattr(self, f"{attr_prefix}_a", a_entry)
 
-        ttk.Label(frame, text="Mass (kg):").grid(row=start_row+2, column=0, sticky="w")
-        mass_entry = ttk.Entry(frame)
+        ctk.CTkLabel(frame, text="Mass (kg):").grid(row=start_row+2, column=0, sticky="w", padx=5, pady=2)
+        mass_entry = ctk.CTkEntry(frame)
         mass_entry.grid(row=start_row+2, column=1, padx=5, pady=2)
         mass_entry.insert(0, default_mass)
         setattr(self, f"{attr_prefix}_mass", mass_entry)
 
-        ttk.Label(frame, text="Initial Mean Anomaly (deg):").grid(row=start_row+3, column=0, sticky="w")
-        theta_entry = ttk.Entry(frame)
+        ctk.CTkLabel(frame, text="Initial Mean Anomaly (deg):").grid(row=start_row+3, column=0, sticky="w", padx=5, pady=2)
+        theta_entry = ctk.CTkEntry(frame)
         theta_entry.grid(row=start_row+3, column=1, padx=5, pady=2)
         theta_entry.insert(0, default_theta)
         setattr(self, f"{attr_prefix}_theta0", theta_entry)
 
     def create_output_fields(self):
-        output_frame = ttk.LabelFrame(self.root, text="Results")
+        output_frame = ctk.CTkFrame(self.root)
         output_frame.pack(pady=10, padx=10, fill="x")
 
-        self.phase_angle_label = ttk.Label(output_frame, text="Phase Angle: ")
-        self.phase_angle_label.pack(anchor="w")
+        title_label = ctk.CTkLabel(output_frame, text="Results", font=ctk.CTkFont(size=16, weight="bold"))
+        title_label.pack(pady=5)
 
-        self.transfer_time_label = ttk.Label(output_frame, text="Time to Transfer Window: ")
-        self.transfer_time_label.pack(anchor="w")
+        self.phase_angle_label = ctk.CTkLabel(output_frame, text="Phase Angle: ")
+        self.phase_angle_label.pack(anchor="w", padx=5, pady=2)
 
-        self.hohmann_time_label = ttk.Label(output_frame, text="Hohmann Transfer Time: ")
-        self.hohmann_time_label.pack(anchor="w")
+        self.transfer_time_label = ctk.CTkLabel(output_frame, text="Time to Transfer Window: ")
+        self.transfer_time_label.pack(anchor="w", padx=5, pady=2)
+
+        self.hohmann_time_label = ctk.CTkLabel(output_frame, text="Hohmann Transfer Time: ")
+        self.hohmann_time_label.pack(anchor="w", padx=5, pady=2)
 
     def calculate(self) -> None:
         """
@@ -212,9 +231,9 @@ class TransferWindowCalculator:
             hohmann_t = hohmann_transfer_time(planet1, planet2)
 
             # Update outputs
-            self.phase_angle_label.config(text=f"Phase Angle: {phi:.2f} degrees")
-            self.transfer_time_label.config(text=f"Time to Transfer Window: {transfer_t / DAYS_TO_SECONDS:.2f} days")
-            self.hohmann_time_label.config(text=f"Hohmann Transfer Time: {hohmann_t / DAYS_TO_SECONDS:.2f} days")
+            self.phase_angle_label.configure(text=f"Phase Angle: {phi:.2f} degrees")
+            self.transfer_time_label.configure(text=f"Time to Transfer Window: {transfer_t / DAYS_TO_SECONDS:.2f} days")
+            self.hohmann_time_label.configure(text=f"Hohmann Transfer Time: {hohmann_t / DAYS_TO_SECONDS:.2f} days")
 
         except ValueError as e:
             self.logger.error(f"Input error: {str(e)}")
@@ -255,7 +274,7 @@ class TransferWindowCalculator:
 
         return name, a_m, mass, theta0
 
-    def _get_positive_float(self, entry: Optional[ttk.Entry], field_name: str) -> float:
+    def _get_positive_float(self, entry: Optional[ctk.CTkEntry], field_name: str) -> float:
         """
         Get a positive float value from an entry field.
 
@@ -273,7 +292,7 @@ class TransferWindowCalculator:
         except ValueError:
             raise ValueError(f"{field_name} must be a valid positive number.")
 
-    def _get_theta0(self, entry: Optional[ttk.Entry], field_name: str) -> float:
+    def _get_theta0(self, entry: Optional[ctk.CTkEntry], field_name: str) -> float:
         """
         Get and validate theta0 (0-360 degrees) from an entry field.
 
@@ -291,7 +310,7 @@ class TransferWindowCalculator:
         except ValueError:
             raise ValueError(f"{field_name} must be a valid number between 0 and {PHASE_ANGLE_MAX}.")
 
-    def _get_non_negative_float(self, entry: Optional[ttk.Entry], field_name: str) -> float:
+    def _get_non_negative_float(self, entry: Optional[ctk.CTkEntry], field_name: str) -> float:
         """
         Get a non-negative float value from an entry field.
 
@@ -310,6 +329,6 @@ class TransferWindowCalculator:
             raise ValueError(f"{field_name} must be a valid non-negative number.")
 
 if __name__ == "__main__":
-    root = tk.Tk()
+    root = ctk.CTk()
     app = TransferWindowCalculator(root)
     root.mainloop()
