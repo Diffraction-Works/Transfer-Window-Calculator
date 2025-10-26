@@ -25,6 +25,16 @@ class TestTransferWindowCalculator(unittest.TestCase):
         self.app.transfer_time_label = MagicMock()
         self.app.hohmann_time_label = MagicMock()
 
+        # Mock the getattr calls in _get_planet_data
+        self.app.planet1_name = MagicMock()
+        self.app.planet1_a = MagicMock()
+        self.app.planet1_mass = MagicMock()
+        self.app.planet1_theta0 = MagicMock()
+        self.app.planet2_name = MagicMock()
+        self.app.planet2_a = MagicMock()
+        self.app.planet2_mass = MagicMock()
+        self.app.planet2_theta0 = MagicMock()
+
     @patch('main.messagebox.showerror')
     def test_calculate_valid_inputs(self, mock_showerror):
         # Set return values for entry gets
@@ -42,9 +52,9 @@ class TestTransferWindowCalculator(unittest.TestCase):
         self.app.calculate()
 
         # Check that labels were updated
-        self.app.phase_angle_label.config.assert_called()
-        self.app.transfer_time_label.config.assert_called()
-        self.app.hohmann_time_label.config.assert_called()
+        self.app.phase_angle_label.config.assert_called_once()
+        self.app.transfer_time_label.config.assert_called_once()
+        self.app.hohmann_time_label.config.assert_called_once()
 
         # Ensure no error was shown
         mock_showerror.assert_not_called()
@@ -57,7 +67,7 @@ class TestTransferWindowCalculator(unittest.TestCase):
         self.app.calculate()
 
         # Check that error was shown
-        mock_showerror.assert_called_with("Error", "could not convert string to float: 'invalid'")
+        mock_showerror.assert_called_with("Input Error", "Semi-major axis for Planet 1 must be a valid positive number.")
 
 if __name__ == '__main__':
     unittest.main()
