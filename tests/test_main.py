@@ -256,5 +256,72 @@ class TestTransferWindowCalculator(unittest.TestCase):
         # Check that error was shown for identical planets
         mock_showerror.assert_called_with("Input Error", "Planets have nearly identical orbital periods; transfer window calculation not applicable.")
 
+    @patch('main.messagebox.showerror')
+    def test_calculate_planet_order_swap(self, mock_showerror):
+        # Test with planet1 having larger a than planet2 (outer to inner)
+        self.app.planet1_name.get.return_value = "Mars"  # type: ignore
+        self.app.planet1_a.get.return_value = "227939366.0"  # type: ignore  # Larger a
+        self.app.planet1_mass.get.return_value = "6.39e23"  # type: ignore
+        self.app.planet1_theta0.get.return_value = "0"  # type: ignore
+        self.app.planet2_name.get.return_value = "Earth"  # type: ignore
+        self.app.planet2_a.get.return_value = "149597870.7"  # type: ignore  # Smaller a
+        self.app.planet2_mass.get.return_value = "5.972e24"  # type: ignore
+        self.app.planet2_theta0.get.return_value = "0"  # type: ignore
+        self.app.central_mass.get.return_value = "1.989e30"  # type: ignore
+        self.app.time_days.get.return_value = "0"  # type: ignore
+
+        self.app.calculate()
+
+        # Should still calculate, but transfer time might be negative or incorrect due to assumption
+        # In current code, delta_n will be negative, leading to potential issues
+        # For now, just check it doesn't crash (though ideally should warn or swap)
+        self.app.phase_angle_label.config.assert_called()  # type: ignore
+        self.app.transfer_time_label.config.assert_called()  # type: ignore
+        self.app.hohmann_time_label.config.assert_called()  # type: ignore
+
+    @patch('main.messagebox.showerror')
+    def test_calculate_large_values(self, mock_showerror):
+        # Test with very large semi-major axes (but different enough to avoid identical periods)
+        self.app.planet1_name.get.return_value = "Large1"  # type: ignore
+        self.app.planet1_a.get.return_value = "1e10"  # type: ignore  # 1e10 km = 1e13 m
+        self.app.planet1_mass.get.return_value = "1e25"  # type: ignore
+        self.app.planet1_theta0.get.return_value = "0"  # type: ignore
+        self.app.planet2_name.get.return_value = "Large2"  # type: ignore
+        self.app.planet2_a.get.return_value = "2e10"  # type: ignore  # Different enough
+        self.app.planet2_mass.get.return_value = "1e25"  # type: ignore
+        self.app.planet2_theta0.get.return_value = "0"  # type: ignore
+        self.app.central_mass.get.return_value = "1.989e30"  # type: ignore
+        self.app.time_days.get.return_value = "0"  # type: ignore
+
+        self.app.calculate()
+
+        # Check calculations complete without overflow
+        self.app.phase_angle_label.config.assert_called()  # type: ignore
+        self.app.transfer_time_label.config.assert_called()  # type: ignore
+        self.app.hohmann_time_label.config.assert_called()  # type: ignore
+        mock_showerror.assert_not_called()
+
+    @patch('main.messagebox.showerror')
+    def test_calculate_small_values(self, mock_showerror):
+        # Test with very small semi-major axes
+        self.app.planet1_name.get.return_value = "Small1"  # type: ignore
+        self.app.planet1_a.get.return_value = "1e-3"  # type: ignore  # 1e-3 km = 1 m
+        self.app.planet1_mass.get.return_value = "1e20"  # type: ignore
+        self.app.planet1_theta0.get.return_value = "0"  # type: ignore
+        self.app.planet2_name.get.return_value = "Small2"  # type: ignore
+        self.app.planet2_a.get.return_value = "2e-3"  # type: ignore
+        self.app.planet2_mass.get.return_value = "1e20"  # type: ignore
+        self.app.planet2_theta0.get.return_value = "0"  # type: ignore
+        self.app.central_mass.get.return_value = "1.989e30"  # type: ignore
+        self.app.time_days.get.return_value = "0"  # type: ignore
+
+        self.app.calculate()
+
+        # Check calculations complete
+        self.app.phase_angle_label.config.assert_called()  # type: ignore
+        self.app.transfer_time_label.config.assert_called()  # type: ignore
+        self.app.hohmann_time_label.config.assert_called()  # type: ignore
+        mock_showerror.assert_not_called()
+
 if __name__ == '__main__':
     unittest.main()
